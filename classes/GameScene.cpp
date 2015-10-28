@@ -73,34 +73,18 @@ void GameScene::onEnter()
 	//mLayerUI->addChild(lb_money);
 
 	//右侧日程显示按钮
-	Button* button = Button::create("schedule_open.png", "schedule_open.png");
+	Button* button = Button::create("button_schedule.png", "button_schedule.png");
 	button->setContentSize(Size(400, 100));
 	button->setPosition(origin + Vec2(visibleSize.width - 250, visibleSize.height - 60));
 	button->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEvent, this));
 	button->setZoomScale(0.4f);
 	button->setPressedActionEnabled(true);
 	mLayerUI->addChild(button);
-	button->setOpacity(100);
+	//button->setOpacity(100);//设置透明度
 	/////////////////////////////////////////////////////////////////////////////////////
 	//mLayerUI  End
 	/////////////////////////////////////////////////////////////////////////////////////
 
-
-	/////////////////////////////////////////////////////////////////////////////////////
-	//mLayerUISchedule  Begin
-	/////////////////////////////////////////////////////////////////////////////////////
-	//this->updateScheduleListView();
-
-
-	////关闭按钮
-	//Button* closeBtn = Button::create("CloseNormal.png", "CloseSelected.png");
-	//closeBtn->setPosition(Vec2(visibleSize.width - closeBtn->getContentSize().width / 2, visibleSize.height - closeBtn->getContentSize().height / 2));
-	//closeBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventSchedule, this));
-	//mLayerUISchedule->addChild(closeBtn);
-
-	/////////////////////////////////////////////////////////////////////////////////////
-	//mLayerUISchedule  End
-	/////////////////////////////////////////////////////////////////////////////////////
 	this->addChild(mLayerBG);
 	this->addChild(mLayerBI);
 	this->addChild(mLayerSP);
@@ -129,16 +113,16 @@ void GameScene::updateScheduleListView()
 	mLayoutSchedule->setSize(Size(visibleSize.width * 0.836f, visibleSize.height - 2));
 	mLayoutSchedule->setPosition(Vec2(visibleSize.width / 2 - mLayoutSchedule->getContentSize().width/2, 1));
 	mLayoutSchedule->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
-	mLayoutSchedule->setBackGroundColor(Color3B(100, 100, 100));
+	mLayoutSchedule->setBackGroundColor(Color3B(255, 255, 255));
 	//mLayoutSchedule->setBackGroundImage("SCloseNormal.png");
 
 	//界面添加和关闭按钮
-	Button* addBtn = Button::create("schedule_add.png", "schedule_add.png");
+	Button* addBtn = Button::create("button_addlistitem.png", "button_addlistitem.png");
 	addBtn->setPosition(Vec2(addBtn->getContentSize().width / 2, mLayoutSchedule->getContentSize().height - addBtn->getContentSize().height / 2));
 	addBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::addScheduleBtn, this));
 	mLayoutSchedule->addChild(addBtn);
 
-	Button* closeBtn = Button::create("schedule_close.png", "schedule_close.png");
+	Button* closeBtn = Button::create("button_close.png", "button_close.png");
 	closeBtn->setPosition(Vec2(mLayoutSchedule->getContentSize().width - closeBtn->getContentSize().width / 2, mLayoutSchedule->getContentSize().height - closeBtn->getContentSize().height / 2));
 	closeBtn->addTouchEventListener(CC_CALLBACK_2(GameScene::closeScheduleBtn, this));
 	mLayoutSchedule->addChild(closeBtn);
@@ -148,7 +132,7 @@ void GameScene::updateScheduleListView()
 
 	mListViewSchedule->setDirection(ui::ScrollView::Direction::VERTICAL);
 	mListViewSchedule->setBounceEnabled(true);
-	mListViewSchedule->setBackGroundImage("green_edit.png");
+	mListViewSchedule->setBackGroundImage("list_view_bg.png");
 	mListViewSchedule->setBackGroundImageScale9Enabled(true);
 	mListViewSchedule->setContentSize(Size(visibleSize.width * 0.836f, (visibleSize.height - 2) * 0.875f));
 	mListViewSchedule->setPosition(Vec2(mLayoutSchedule->getContentSize().width / 2 - mListViewSchedule->getContentSize().width / 2, 1));
@@ -158,12 +142,16 @@ void GameScene::updateScheduleListView()
 	{
 		//单个容器
 		Layout* layout = Layout::create();
-		layout->setSize(Size(visibleSize.width * 0.836f, visibleSize.height * 0.121f));
-		layout->setBackGroundImage("schedule_list_item.png");
+		layout->setSize(Size(visibleSize.width * 0.83f, visibleSize.height * 0.121f));
+		layout->setBackGroundImageScale9Enabled(true);
+		layout->setBackGroundImage("gray.png");
 
 		//事件图标
-		CCSprite* sp = CCSprite::create("action_sleep_icon.png");
-		sp->setContentSize(Size(layout->getContentSize().height, layout->getContentSize().height));
+		char num[64];
+		memset(num, 0, 8);
+		sprintf(num, "icon_%d.png", i + 1);
+		CCSprite* sp = CCSprite::create(num);
+		//sp->setContentSize(Size(layout->getContentSize().height, layout->getContentSize().height));
 		sp->setPosition(layout->getContentSize().width * 0.04f, layout->getContentSize().height/2-1);
 		layout->addChild(sp);
 
