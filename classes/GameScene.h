@@ -20,18 +20,38 @@ public:
 	void updatePlayerState(std::string& msg);
 	CREATE_FUNC(GameScene);
 	void updateScheduleListView();
+	void updateEditorUIMenuLayer();
+	void updateEditorUILayer();
+	void updateEditorLayer();
+	void onEditorLayerTouchesMoved(const std::vector<Touch*>& touches, Event  *event);
 	void touchEvent(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventPH(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventBJ(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventMY(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventEditorUIMenuClose(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventEditorUIMenuEditor(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventEditorUIMenuClone(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventEditorUIMenuTest(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventEditorUISave(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventEditorUICancel(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventEditorUIRemove(Ref *pSender, ui::Widget::TouchEventType type);
+	void touchEventEditorUIDelete(Ref *pSender, ui::Widget::TouchEventType type);
 	void closeScheduleBtn(Ref *pSender, ui::Widget::TouchEventType type);
 	void addScheduleBtn(Ref* pSender, ui::Widget::TouchEventType type);
+
 private:
 	Label* mLabel_state;
 	Layer* mLayerUI;
 	Layer* mLayerUISchedule;
+	Layer* mLayerUIEditorMenu;
+	Layer* mLayerUIEditor;
+	Layer* mLayerEditor;
 
 	Layer* mLayerFI;
 	Layer* mLayerSP;
 	Layer* mLayerBI;
 	Layer* mLayerBG;
+	LayerMultiplex* mUILayerManager;
 	LayerMultiplex* mLayerManager;
 };
 

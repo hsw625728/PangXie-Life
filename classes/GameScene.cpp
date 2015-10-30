@@ -6,6 +6,7 @@
 using namespace cocos2d;
 using namespace ui;
 
+#define kTagTileMap 100
 template<> GameScene* Singleton<GameScene>::msSingleton = 0;
 GameScene::GameScene()
 {
@@ -36,6 +37,9 @@ void GameScene::onEnter()
 
 	mLayerUI = Layer::create();
 	mLayerUISchedule = Layer::create();
+	mLayerUIEditorMenu = Layer::create();
+	mLayerUIEditor = Layer::create();
+	mLayerEditor = Layer::create();
 	mLayerFI = Layer::create();
 	mLayerSP = Layer::create();
 	mLayerBI = Layer::create();
@@ -85,21 +89,149 @@ void GameScene::onEnter()
 	//mLayerUI  End
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	this->addChild(mLayerBG);
-	this->addChild(mLayerBI);
-	this->addChild(mLayerSP);
-	this->addChild(mLayerFI);
+	//排行榜
+	Button* button_ph = Button::create("button_schedule.png", "button_schedule.png");
+	//button->setContentSize(Size(400, 100));
+	button_ph->setPosition(origin + Vec2(visibleSize.width/2, visibleSize.height/2 - 260));
+	button_ph->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventPH, this));
+	button_ph->setZoomScale(0.4f);
+	button_ph->setPressedActionEnabled(true);
+	mLayerUI->addChild(button_ph);
 
-	mLayerManager = LayerMultiplex::create(mLayerUI, mLayerUISchedule, nullptr);
+	//编辑器
+	Button* button_bj = Button::create("button_schedule.png", "button_schedule.png");
+	//button->setContentSize(Size(400, 100));
+	button_bj->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2));
+	button_bj->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventBJ, this));
+	button_bj->setZoomScale(0.4f);
+	button_bj->setPressedActionEnabled(true);
+	mLayerUI->addChild(button_bj);
+	updateEditorUIMenuLayer();
+	updateEditorUILayer();
+	updateEditorLayer();
+	//我的骨牌
+	Button* button_my = Button::create("button_schedule.png", "button_schedule.png");
+	//button->setContentSize(Size(400, 100));
+	button_my->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2 + 260));
+	button_my->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventMY, this));
+	button_my->setZoomScale(0.4f);
+	button_my->setPressedActionEnabled(true);
+	mLayerUI->addChild(button_my);
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	//mLayerSp Begin
+	/////////////////////////////////////////////////////////////////////////////////////
+	std::string plist_content;
+	{
+		std::string fullPath = FileUtils::getInstance()->fullPathForFilename("yintama_animation.plist");
+		Data data = FileUtils::getInstance()->getDataFromFile(fullPath);
+		if (!data.isNull())
+			plist_content.assign((const char*)data.getBytes(), data.getSize());
+	}
+
+	std::string image_content;
+	{
+		std::string fullPath = FileUtils::getInstance()->fullPathForFilename("yintama_animation.png");
+		Data data = FileUtils::getInstance()->getDataFromFile(fullPath);
+		if (!data.isNull())
+			image_content.assign((const char*)data.getBytes(), data.getSize());
+	}
+
+	Image image;
+	image.initWithImageData((const uint8_t*)image_content.c_str(), image_content.size());
+	Texture2D* texture = new (std::nothrow) Texture2D();
+	texture->initWithImage(&image);
+	texture->autorelease();
+
+	auto cache = SpriteFrameCache::getInstance();
+	cache->addSpriteFramesWithFileContent(plist_content, texture);
+
+	//
+	// Animation using Sprite BatchNode
+	//
+	Sprite * sprite = Sprite::createWithSpriteFrameName("image_yin_01.png");
+	//sprite->setScale(4.0f);
+	sprite->setPosition(Vec2(visibleSize.width / 2 - 80, visibleSize.height / 2));
+	mLayerSP->addChild(sprite);
+
+	Vector<SpriteFrame*> animFrames(4);
+
+	char str[100] = { 0 };
+	for (int i = 1; i < 4; i++)
+	{
+		sprintf(str, "image_yin_%02d.png", i);
+		auto frame = cache->getSpriteFrameByName(str);
+		animFrames.pushBack(frame);
+	}
+	auto frame = cache->getSpriteFrameByName("image_yin_02.png");
+	animFrames.pushBack(frame);
+
+	auto animation = Animation::createWithSpriteFrames(animFrames, 0.3f);
+	sprite->runAction(RepeatForever::create(Animate::create(animation)));
+	/////////////////////////////////////////////////////////////////////////////////////
+	//mLayerSP End
+	/////////////////////////////////////////////////////////////////////////////////////
+	this->addChild(mLayerBG);
+
+	mUILayerManager = LayerMultiplex::create(mLayerUI, mLayerUISchedule, mLayerUIEditorMenu, mLayerUIEditor, nullptr);
+	mUILayerManager->switchTo(0);
+
+	mLayerManager = LayerMultiplex::create(mLayerBI, mLayerSP, mLayerFI, mLayerEditor, nullptr);
 	mLayerManager->switchTo(0);
+
 	this->addChild(mLayerManager);
+	this->addChild(mUILayerManager);
 	NetManager::getSingleton().cs_Login();
 }
 void GameScene::updatePlayerState(std::string& msg)
 {
 	mLabel_state->setString(msg);
 }
+void GameScene::updateEditorUIMenuLayer()
+{
+	mLayerUIEditorMenu->removeAllChildren();
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
+	//界面整体背景
+	Layout* layoutBG = Layout::create();
+	layoutBG->setSize(Size(visibleSize.width*0.95f, visibleSize.height*0.95f));
+	layoutBG->setPosition(Vec2(visibleSize.width*0.025f, visibleSize.height*0.025f));
+	layoutBG->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
+	layoutBG->setBackGroundColor(Color3B(255, 255, 255));
+	mLayerUIEditorMenu->addChild(layoutBG);
+
+	//标题栏
+	Layout* layout_title = Layout::create();
+	layout_title->setSize(Size(visibleSize.width * 0.94f, visibleSize.height * 0.05f));
+	layout_title->setPosition(Vec2(visibleSize.width * 0.005f, visibleSize.height * 0.88f));
+	layout_title->setBackGroundImageScale9Enabled(true);
+	layout_title->setBackGroundImage("gray.png");
+	layoutBG->addChild(layout_title);
+
+	//关闭按钮
+	Button* button_close = Button::create("CloseNormal.png", "CloseSelected.png");
+	button_close->setPosition(Vec2(layout_title->getSize().width * 0.9f , 1));
+	button_close->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIMenuClose, this));
+	layout_title->addChild(button_close);
+
+	//编辑按钮
+	Button* button_editor = Button::create("button_schedule.png", "button_schedule.png");
+	button_editor->setPosition(Vec2(visibleSize.width / 2 - 150, 10));
+	button_editor->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIMenuEditor, this));
+	layoutBG->addChild(button_editor);
+	//复制按钮
+	Button* button_clone = Button::create("button_schedule.png", "button_schedule.png");
+	button_clone->setPosition(Vec2(visibleSize.width / 2, 10));
+	button_clone->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIMenuClone, this));
+	layoutBG->addChild(button_clone);
+	//测试按钮
+	Button* button_test = Button::create("button_schedule.png", "button_schedule.png");
+	button_test->setPosition(Vec2(visibleSize.width / 2 + 150, 10));
+	button_test->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIMenuTest, this));
+	layoutBG->addChild(button_test);
+
+}
 void GameScene::updateScheduleListView()
 {
 	mLayerUISchedule->removeAllChildren();
@@ -225,6 +357,144 @@ void GameScene::updateScheduleListView()
 	mLayoutSchedule->addChild(mListViewSchedule);
 	mLayerUISchedule->addChild(mLayoutSchedule);
 }
+void GameScene::updateEditorUILayer()
+{
+	mLayerUIEditor->removeAllChildren();
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	//底部物件UI
+	Layout* layout_title = Layout::create();
+	layout_title->setSize(Size(visibleSize.width, visibleSize.width * 0.1f));
+	layout_title->setPosition(Vec2(0.0f, visibleSize.height * 0.02f));
+	layout_title->setBackGroundImageScale9Enabled(true);
+	layout_title->setBackGroundImage("sliderProgress.png");
+	layout_title->setOpacity(50);
+	mLayerUIEditor->addChild(layout_title);
+
+	for (int i = 0; i < 8; i++)
+	{
+		Layout* layout = Layout::create();
+		layout->setSize(Size(visibleSize.width * 0.09f, visibleSize.width*0.09f));
+		layout->setPosition(Vec2(visibleSize.width*0.125f*i, 0.0f));
+		layout->setBackGroundImageScale9Enabled(true);
+		layout->setBackGroundImage("gray.png");
+		layout->setOpacity(50);
+		layout_title->addChild(layout);
+	}
+
+	//保存按钮
+	Button* button_save = Button::create("button_schedule.png", "button_schedule.png");
+	button_save->setPosition(Vec2(visibleSize.width*0.1f, visibleSize.height*0.4f));
+	button_save->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUISave, this));
+	mLayerUIEditor->addChild(button_save);
+
+	//取消按钮
+	Button* button_cancel = Button::create("button_schedule.png", "button_schedule.png");
+	button_cancel->setPosition(Vec2(visibleSize.width*0.1f, visibleSize.height*0.25f));
+	button_cancel->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUICancel, this));
+	mLayerUIEditor->addChild(button_cancel);
+
+	//移除按钮
+	Button* button_remove = Button::create("button_schedule.png", "button_schedule.png");
+	button_remove->setPosition(Vec2(visibleSize.width*0.8f, visibleSize.height*0.4f));
+	button_remove->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIRemove, this));
+	mLayerUIEditor->addChild(button_remove);
+
+	//删除模式按钮
+	Button* button_delete = Button::create("button_schedule.png", "button_schedule.png");
+	button_delete->setPosition(Vec2(visibleSize.width*0.8f, visibleSize.height*0.25));
+	button_delete->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIDelete, this));
+	mLayerUIEditor->addChild(button_delete);
+}
+void GameScene::updateEditorLayer()
+{
+	mLayerEditor->removeAllChildren();
+
+	auto listener = EventListenerTouchAllAtOnce::create();
+	listener->onTouchesMoved = CC_CALLBACK_2(GameScene::onEditorLayerTouchesMoved, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, mLayerEditor);
+
+	auto map = TMXTiledMap::create("tile.tmx");
+	mLayerEditor->addChild(map, 0, kTagTileMap);
+
+	// move map to the center of the screen
+	auto ms = map->getMapSize();
+	auto ts = map->getTileSize();
+	//map->runAction(MoveTo::create(1.0f, Vec2(-ms.width * ts.width / 2, -ms.height * ts.height / 2)));
+
+	// testing release map
+	TMXLayer* layer;
+
+	auto& children = map->getChildren();
+	for (const auto &node : children) {
+		layer = static_cast<TMXLayer*>(node);
+		layer->releaseMap();
+	}
+
+}
+
+void GameScene::onEditorLayerTouchesMoved(const std::vector<Touch*>& touches, Event  *event)
+{
+	auto winSize = Director::getInstance()->getWinSize();
+	auto node = mLayerEditor->getChildByTag(kTagTileMap);
+	if (touches.size() == 1)
+	{
+		auto touch = touches[0];
+
+		auto diff = touch->getDelta();
+		auto currentPos = node->getPosition();
+		node->setPosition(currentPos + diff);
+	}
+	else if (touches.size() > 1)
+	{
+		Vec2 bgOrigin = Vec2(Vec2::ZERO);
+		auto point1 = touches[0]->getLocation();
+		auto point2 = touches[1]->getLocation();
+		auto curDistance = point1.distance(point2);
+		auto preDistance = touches[0]->getPreviousLocation().distance(touches[1]->getPreviousLocation());
+		//两触摸点与原点的差向量，pointVec1和pointVec2是相对于bgSprite的位置
+		auto pointVec1 = point1 - bgOrigin;
+		auto pointVec2 = point2 - bgOrigin;
+		//两触摸点的相对中点
+		auto relMidx = (pointVec1.x + pointVec2.x) / 2;
+		auto relMidy = (pointVec1.y + pointVec2.y) / 2;
+		// 计算bgSprite的锚点
+		auto anchorX = relMidx / node->getBoundingBox().size.width;
+		auto anchorY = relMidy / node->getBoundingBox().size.height;
+		// 相对屏幕的中点
+		auto absMidx = (point2.x + point1.x) / 2;
+		auto absMidy = (point2.y + point1.y) / 2;
+		// 缩放时，为了避免出现空白的区域，需要做以下的边界处理。
+		// 当bgSprite快要进入到屏幕时，修改bgSprite的位置（既absMidx和absMidy）。
+		if ( bgOrigin.x > 0)
+		{
+			absMidx -= bgOrigin.x;
+		}
+		if (bgOrigin.x < -node->getBoundingBox().size.width + winSize.width)
+		{
+			absMidx += -node->getBoundingBox().size.width + winSize.width - bgOrigin.x;
+		}
+		if ( bgOrigin.y > 0)
+		{
+			absMidy -= bgOrigin.y;
+		}
+		if (bgOrigin.y < -node->getBoundingBox().size.height + winSize.height)
+		{
+			absMidy += -node->getBoundingBox().size.height + winSize.height - bgOrigin.y;
+		}
+		// 重设bgSprite锚点和位置
+		node->setAnchorPoint(Vec2(anchorX, anchorY));
+		node->setPosition(Vec2(absMidx, absMidy));
+		// 根据两触摸点前后的距离计算缩放倍率
+		auto scale = node->getScale() * (curDistance / preDistance);
+		// 控制缩放倍率在1～4倍之间，最小倍率不能太小，不让背景将不能填充满整个屏幕。
+		scale = MIN(4, MAX(1, scale));
+		node->setScale(scale);
+		// 更新原点位置
+		bgOrigin = Vec2(absMidx, absMidy) - Vec2(node->getBoundingBox().size.width * anchorX, node->getBoundingBox().size.height * anchorY);
+	}
+}
 
 void GameScene::touchEvent(Ref *pSender, Widget::TouchEventType type)
 {
@@ -241,12 +511,244 @@ void GameScene::touchEvent(Ref *pSender, Widget::TouchEventType type)
 	case Widget::TouchEventType::ENDED:
 	{
 		mLabel_state->setString(StringUtils::format("Touch Up"));
-		mLayerManager->switchTo(1);
+		mUILayerManager->switchTo(1);
 	}
 		break;
 
 	case Widget::TouchEventType::CANCELED:
 		mLabel_state->setString(StringUtils::format("Touch Cancelled"));
+		break;
+
+	default:
+		break;
+	}
+}
+void GameScene::touchEventPH(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+		break;
+
+	case Widget::TouchEventType::CANCELED:
+		break;
+
+	default:
+		break;
+	}
+}
+void GameScene::touchEventBJ(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+		mUILayerManager->switchTo(2);
+		break;
+
+	case Widget::TouchEventType::CANCELED:
+		break;
+
+	default:
+		break;
+	}
+}
+void GameScene::touchEventMY(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+		break;
+
+	case Widget::TouchEventType::CANCELED:
+		break;
+
+	default:
+		break;
+	}
+}
+
+void GameScene::touchEventEditorUIMenuClose(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+		mUILayerManager->switchTo(0);
+		break;
+
+	case Widget::TouchEventType::CANCELED:
+		break;
+
+	default:
+		break;
+	}
+}
+void GameScene::touchEventEditorUIMenuEditor(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+	{
+		mUILayerManager->switchTo(3);
+		mLayerManager->switchTo(3);
+	}
+		break;
+
+	case Widget::TouchEventType::CANCELED:
+		break;
+
+	default:
+		break;
+	}
+}
+void GameScene::touchEventEditorUIMenuClone(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+		break;
+
+	case Widget::TouchEventType::CANCELED:
+		break;
+
+	default:
+		break;
+	}
+}
+void GameScene::touchEventEditorUIMenuTest(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+		break;
+
+	case Widget::TouchEventType::CANCELED:
+		break;
+
+	default:
+		break;
+	}
+}
+
+void GameScene::touchEventEditorUISave(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+		mUILayerManager->switchTo(2);
+		mLayerManager->switchTo(1);
+		break;
+
+	case Widget::TouchEventType::CANCELED:
+		break;
+
+	default:
+		break;
+	}
+}
+void GameScene::touchEventEditorUICancel(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+		mUILayerManager->switchTo(2);
+		mLayerManager->switchTo(1);
+		break;
+
+	case Widget::TouchEventType::CANCELED:
+		break;
+
+	default:
+		break;
+	}
+}
+void GameScene::touchEventEditorUIRemove(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+		break;
+
+	case Widget::TouchEventType::CANCELED:
+		break;
+
+	default:
+		break;
+	}
+}
+void GameScene::touchEventEditorUIDelete(Ref *pSender, ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case Widget::TouchEventType::BEGAN:
+		break;
+
+	case Widget::TouchEventType::MOVED:
+		break;
+
+	case Widget::TouchEventType::ENDED:
+		break;
+
+	case Widget::TouchEventType::CANCELED:
 		break;
 
 	default:
@@ -265,7 +767,7 @@ void GameScene::closeScheduleBtn(Ref *pSender, ui::Widget::TouchEventType type)
 
 	case Widget::TouchEventType::ENDED:
 	{
-		mLayerManager->switchTo(0);
+		mUILayerManager->switchTo(0);
 	}
 		break;
 
