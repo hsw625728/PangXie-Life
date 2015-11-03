@@ -1,7 +1,9 @@
 #include "GameScene.h"
 #include "Player.h"
+#include "DominoManager.h"
 #include "NetWork.h"
-#include "cocos2d\cocos\ui\UIButton.h"
+#include "ui\UIButton.h"
+#include "ui\UIRadioButton.h"
 
 using namespace cocos2d;
 using namespace ui;
@@ -12,11 +14,13 @@ GameScene::GameScene()
 {
 	new NetManager();
 	new Player();
+	new DominoManager();
 }
 GameScene::~GameScene()
 {
 	delete NetManager::getSingletonPtr();
 	delete Player::getSingletonPtr();
+	delete DominoManager::getSingletonPtr();
 }
 bool GameScene::init()
 {
@@ -372,16 +376,31 @@ void GameScene::updateEditorUILayer()
 	layout_title->setOpacity(50);
 	mLayerUIEditor->addChild(layout_title);
 
+	//RadioButtonGroup
+	RadioButtonGroup* radioButtonGroup = RadioButtonGroup::create();
+	layout_title->addChild(radioButtonGroup);
+	radioButtonGroup->addEventListener(CC_CALLBACK_3(GameScene::onChangedEditorUIRadioButtonGroup, this));
 	for (int i = 0; i < 8; i++)
 	{
 		Layout* layout = Layout::create();
 		layout->setSize(Size(visibleSize.width * 0.09f, visibleSize.width*0.09f));
-		layout->setPosition(Vec2(visibleSize.width*0.125f*i, 0.0f));
+		layout->setPosition(Vec2(visibleSize.width*0.125f*i + visibleSize.width*0.0175f, 0.0f));
 		layout->setBackGroundImageScale9Enabled(true);
 		layout->setBackGroundImage("gray.png");
 		layout->setOpacity(50);
+		
+		auto filePathNormal = StringUtils::format("editor_ui_radio_button%1d.png", i + 1);
+		auto filePathSelected = StringUtils::format("editor_ui_radio_button%1ds.png", i + 1);
+		RadioButton* rb = RadioButton::create(filePathNormal, filePathSelected);
+		rb->setPosition(Vec2(visibleSize.width*0.045f, visibleSize.width*0.045f));
+		//rb->setScale();
+		//rb->setZoomScale();
+		radioButtonGroup->addRadioButton(rb);
+
+		layout->addChild(rb);
 		layout_title->addChild(layout);
 	}
+	radioButtonGroup->setSelectedButton(0);
 
 	//保存按钮
 	Button* button_save = Button::create("button_schedule.png", "button_schedule.png");
@@ -411,36 +430,44 @@ void GameScene::updateEditorLayer()
 {
 	mLayerEditor->removeAllChildren();
 
+	//这个是临时测试数据
+	//地图上布满朝向为↘的牌
+	char mapStr[900] = {0};
+	memset(mapStr, 7, 900);
+
+	int mapSize = sqrt(sizeof(mapStr));
+
 	auto listener = EventListenerTouchAllAtOnce::create();
 	listener->onTouchesMoved = CC_CALLBACK_2(GameScene::onEditorLayerTouchesMoved, this);
+	listener->onTouchesBegan = CC_CALLBACK_2(GameScene::onEditorLayerTouchesBegan, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, mLayerEditor);
 
-	auto map = TMXTiledMap::create("tile.tmx");
+	TMXTiledMap* map = TMXTiledMap::create("tile.tmx");
+	auto layer = map->getLayer("map");
+	map->setScale(0.9275f);
+
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	
+	auto ts = map->getTileSize();
+	auto ms = map->getMapSize();
+	map->setPosition(visibleSize.width / 2 - ts.width*ms.width / 2, visibleSize.height / 2 - ts.height*ms.height / 2);
+
 	mLayerEditor->addChild(map, 0, kTagTileMap);
 
-	// move map to the center of the screen
-	auto ms = map->getMapSize();
-	auto ts = map->getTileSize();
-	//map->runAction(MoveTo::create(1.0f, Vec2(-ms.width * ts.width / 2, -ms.height * ts.height / 2)));
-
-	// testing release map
-	TMXLayer* layer;
-
-	auto& children = map->getChildren();
-	for (const auto &node : children) {
-		layer = static_cast<TMXLayer*>(node);
-		layer->releaseMap();
-	}
-
+	//初始化DominoManager
+	DominoManager::getSingleton().setTileWidth(ts.width);
+	DominoManager::getSingleton().setTileHeight(ts.height);
+	DominoManager::getSingleton().setCurEditorTileIndex(0);
 }
 
 void GameScene::onEditorLayerTouchesMoved(const std::vector<Touch*>& touches, Event  *event)
 {
 	auto winSize = Director::getInstance()->getWinSize();
-	auto node = mLayerEditor->getChildByTag(kTagTileMap);
+	TMXTiledMap* node = static_cast<TMXTiledMap*>(mLayerEditor->getChildByTag(kTagTileMap));
+
 	if (touches.size() == 1)
 	{
-		auto touch = touches[0];
+		Touch* touch = touches[0];
 
 		auto diff = touch->getDelta();
 		auto currentPos = node->getPosition();
@@ -494,6 +521,36 @@ void GameScene::onEditorLayerTouchesMoved(const std::vector<Touch*>& touches, Ev
 		// 更新原点位置
 		bgOrigin = Vec2(absMidx, absMidy) - Vec2(node->getBoundingBox().size.width * anchorX, node->getBoundingBox().size.height * anchorY);
 	}
+}
+void GameScene::onEditorLayerTouchesBegan(const std::vector<Touch*>& touches, Event  *event)
+{
+	auto winSize = Director::getInstance()->getWinSize();
+	TMXTiledMap* map = static_cast<TMXTiledMap*>(mLayerEditor->getChildByTag(kTagTileMap));
+	auto point = map->getPosition();
+	auto ms = map->getMapSize();
+
+	CCPoint beginpos = touches[0]->getLocation();
+	float x = beginpos.x - point.x;
+	float y = beginpos.y - point.y;
+
+	int mapWidth = map->getMapSize().width * map->getTileSize().width;
+	int mapHeight = map->getMapSize().height * map->getTileSize().height;
+	CCPoint pos = DominoManager::getSingleton().calculateCoordinate(x, y, mapWidth, mapHeight);
+	int xx = pos.x;
+	int yy = pos.y;
+
+	auto layer = map->getLayer("map");
+
+	if (xx >= 0 && yy >= 0 && xx < ms.width && yy < ms.height)
+	{
+		int type = DominoManager::getSingleton().getCurEditorTileType();
+		if (type != -1)
+			layer->setTileGID(type, Vec2(xx, yy));
+	}
+}
+void GameScene::onChangedEditorUIRadioButtonGroup(cocos2d::ui::RadioButton* radioButton, int index, cocos2d::ui::RadioButtonGroup::EventType type)
+{
+	DominoManager::getSingleton().setCurEditorTileIndex(index);
 }
 
 void GameScene::touchEvent(Ref *pSender, Widget::TouchEventType type)

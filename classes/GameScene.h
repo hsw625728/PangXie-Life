@@ -3,9 +3,10 @@
 
 #include "Singleton.h"
 #include "cocos2d.h"
-#include "cocos2d\cocos\ui\UIWidget.h"
-#include "cocos2d\cocos\ui\UIListView.h"
-#include "cocos2d\cocos\2d\CCLayer.h"
+#include "ui\UIWidget.h"
+#include "ui\UIListView.h"
+#include "2d\CCLayer.h"
+#include "ui\UIRadioButton.h"
 
 using namespace cocos2d;
 using namespace ui;
@@ -24,6 +25,8 @@ public:
 	void updateEditorUILayer();
 	void updateEditorLayer();
 	void onEditorLayerTouchesMoved(const std::vector<Touch*>& touches, Event  *event);
+	void onEditorLayerTouchesBegan(const std::vector<Touch*>& touches, Event  *event);
+	void onChangedEditorUIRadioButtonGroup(ui::RadioButton* radioButton, int index, ui::RadioButtonGroup::EventType type);
 	void touchEvent(Ref *pSender, ui::Widget::TouchEventType type);
 	void touchEventPH(Ref *pSender, ui::Widget::TouchEventType type);
 	void touchEventBJ(Ref *pSender, ui::Widget::TouchEventType type);
