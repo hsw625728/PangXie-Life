@@ -32,7 +32,7 @@ void LogoScene::onEnter()
 	auto layer = LayerColor::create(Color4B(255, 255, 255, 255));
 	this->addChild(layer);
 
-	auto sprite = Sprite::create("tex/Logo1.png");
+	auto sprite = Sprite::create("Logo1.png");
 	sprite->setPosition(Vec2(visibleSize.width / 2 + 114, visibleSize.height / 2));
 	layer->addChild(sprite);
 

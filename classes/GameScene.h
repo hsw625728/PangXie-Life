@@ -3,10 +3,10 @@
 
 #include "Singleton.h"
 #include "cocos2d.h"
-#include "ui\UIWidget.h"
-#include "ui\UIListView.h"
-#include "2d\CCLayer.h"
-#include "ui\UIRadioButton.h"
+#include "ui/UIWidget.h"
+#include "ui/UIListView.h"
+#include "2d/CCLayer.h"
+#include "ui/UIRadioButton.h"
 
 using namespace cocos2d;
 using namespace ui;

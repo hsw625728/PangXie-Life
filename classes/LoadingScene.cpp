@@ -41,7 +41,7 @@ void LoadingScene::onEnter()
 	layer->addChild(pr_con, 1);
 
 	//设置进度条
-	loadingBar = LoadingBar::create("Progress.png");
+	loadingBar = LoadingBar::create("progress.png");
 	loadingBar->setTag(0);
 	loadingBar->setScale9Enabled(true);
 	loadingBar->setCapInsets(Rect(4, 0, 115, 0));
@@ -59,14 +59,14 @@ void LoadingScene::onEnter()
 	loadinghead->setDirection(LoadingBar::Direction::LEFT);
 	layer->addChild(loadinghead, 3);
 
-	auto label = Label::createWithTTF("L o a d i n g  . . .  . . .", "fonts/STLITI.TTF", 24);
+	auto label = Label::createWithTTF("L o a d i n g  . . .  . . .", "STLITI.TTF", 24);
 	// position the label on the center of the screen
 	label->setPosition(origin + Vec2(visibleSize.width / 2 + 4, visibleSize.height / 2 - 226));
 	// add the label as a child to this layer
 	layer->addChild(label, 4);
 
 
-	percentLabel = Label::createWithTTF("0", "fonts/STLITI.TTF", 18);
+	percentLabel = Label::createWithTTF("0", "STLITI.TTF", 18);
 	percentLabel->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height - percentLabel->getContentSize().height - 24));
 	layer->addChild(percentLabel, 5);
 
