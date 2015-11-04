@@ -2,8 +2,8 @@
 #include "Player.h"
 #include "DominoManager.h"
 #include "NetWork.h"
-#include "ui\UIButton.h"
-#include "ui\UIRadioButton.h"
+#include "ui/UIButton.h"
+#include "ui/UIRadioButton.h"
 
 using namespace cocos2d;
 using namespace ui;
@@ -54,7 +54,7 @@ void GameScene::onEnter()
 	/////////////////////////////////////////////////////////////////////////////////////
 	//左上角名字Label
 	std::string spider(Player::getSingleton().getNickname());
-	Label* lb_name = Label::createWithTTF(spider, "fonts/STLITI.TTF", 72);
+	Label* lb_name = Label::createWithTTF(spider, "STLITI.TTF", 72);
 	lb_name->setDimensions(400, 100);
 	lb_name->setColor(Color3B(125, 0, 0));
 	lb_name->setPosition(origin + Vec2(250, visibleSize.height - 60));
@@ -62,7 +62,7 @@ void GameScene::onEnter()
 	mLayerUI->addChild(lb_name);
 
 	//中间状态Label
-	mLabel_state = Label::createWithTTF("Sleep ... ...", "fonts/STLITI.TTF", 72);
+	mLabel_state = Label::createWithTTF("Sleep ... ...", "STLITI.TTF", 72);
 	mLabel_state->setDimensions(1000, 100);
 	mLabel_state->setColor(Color3B(125, 0, 0));
 	mLabel_state->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height - 60));
@@ -73,7 +73,7 @@ void GameScene::onEnter()
 	//char moneyStr[64];
 	//memset(moneyStr, 0, 64);
 	//_i64toa(Player::getSingleton().getMoney(), moneyStr, 10);
-	//Label* lb_money = Label::createWithTTF(std::string(moneyStr), "fonts/STLITI.TTF", 72);
+	//Label* lb_money = Label::createWithTTF(std::string(moneyStr), "STLITI.TTF", 72);
 	//lb_money->setDimensions(400, 100);
 	//lb_money->setColor(Color3B(125, 0, 0));
 	//lb_money->setPosition(origin + Vec2(visibleSize.width - 250, visibleSize.height - 60));
@@ -292,7 +292,7 @@ void GameScene::updateScheduleListView()
 		layout->addChild(sp);
 
 		//事件名称
-		Label* lb = Label::createWithTTF(std::string("Sleep"), "fonts/STLITI.TTF", 46);
+		Label* lb = Label::createWithTTF(std::string("Sleep"), "STLITI.TTF", 46);
 		lb->enableShadow(Color4B::GRAY, Size(10, 10));
 		lb->enableOutline(Color4B::BLACK, 3);
 		lb->setAlignment(TextHAlignment::CENTER, TextVAlignment::CENTER);
@@ -301,7 +301,7 @@ void GameScene::updateScheduleListView()
 		layout->addChild(lb);
 
 		//持续时间
-		Label* lbtime = Label::createWithTTF(acts.at(i).second, "fonts/STLITI.TTF", 46);
+		Label* lbtime = Label::createWithTTF(acts.at(i).second, "STLITI.TTF", 46);
 		lbtime->enableShadow(Color4B::GRAY, Size(10, 10));
 		lbtime->enableOutline(Color4B::BLACK, 3);
 		lbtime->setAlignment(TextHAlignment::CENTER, TextVAlignment::CENTER);
@@ -310,7 +310,7 @@ void GameScene::updateScheduleListView()
 		layout->addChild(lbtime);
 
 		//开始时间和结束时间
-		Label* lbstartl = Label::createWithTTF("Start", "fonts/STLITI.TTF", 30);
+		Label* lbstartl = Label::createWithTTF("Start", "STLITI.TTF", 30);
 		lbstartl->enableShadow(Color4B::GRAY, Size(10, 10));
 		lbstartl->enableOutline(Color4B::BLACK, 3);
 		lbstartl->setAlignment(TextHAlignment::CENTER, TextVAlignment::CENTER);
@@ -318,7 +318,7 @@ void GameScene::updateScheduleListView()
 		lbstartl->setDimensions(layout->getContentSize().width * 0.15f, layout->getContentSize().height / 2);
 		layout->addChild(lbstartl);
 
-		Label* lbendl = Label::createWithTTF("End", "fonts/STLITI.TTF", 30);
+		Label* lbendl = Label::createWithTTF("End", "STLITI.TTF", 30);
 		lbendl->enableShadow(Color4B::GRAY, Size(10, 10));
 		lbendl->enableOutline(Color4B::BLACK, 3);
 		lbendl->setAlignment(TextHAlignment::CENTER, TextVAlignment::CENTER);
@@ -328,9 +328,9 @@ void GameScene::updateScheduleListView()
 
 		Label* lbstart;
 		if (i == 0)
-			lbstart = Label::createWithTTF("00:00:00", "fonts/STLITI.TTF", 30);
+			lbstart = Label::createWithTTF("00:00:00", "STLITI.TTF", 30);
 		else
-			lbstart = Label::createWithTTF(acts.at(i - 1).second, "fonts/STLITI.TTF", 30);
+			lbstart = Label::createWithTTF(acts.at(i - 1).second, "STLITI.TTF", 30);
 		lbstart->enableShadow(Color4B::GRAY, Size(10, 10));
 		lbstart->enableOutline(Color4B::BLACK, 3);
 		lbstart->setAlignment(TextHAlignment::CENTER, TextVAlignment::CENTER);
@@ -340,9 +340,9 @@ void GameScene::updateScheduleListView()
 		
 		Label* lbend;
 		if (i == acts.size() - 1)
-			lbend = Label::createWithTTF("00:00:00", "fonts/STLITI.TTF", 30);
+			lbend = Label::createWithTTF("00:00:00", "STLITI.TTF", 30);
 		else
-			lbend = Label::createWithTTF(acts.at(i + 1).second, "fonts/STLITI.TTF", 30);
+			lbend = Label::createWithTTF(acts.at(i + 1).second, "STLITI.TTF", 30);
 		lbend->enableShadow(Color4B::GRAY, Size(10, 10));
 		lbend->enableOutline(Color4B::BLACK, 3);
 		lbend->setAlignment(TextHAlignment::CENTER, TextVAlignment::CENTER);
@@ -455,9 +455,53 @@ void GameScene::updateEditorLayer()
 	mLayerEditor->addChild(map, 0, kTagTileMap);
 
 	//初始化DominoManager
-	DominoManager::getSingleton().setTileWidth(ts.width);
-	DominoManager::getSingleton().setTileHeight(ts.height);
+	DominoManager::getSingleton().setTileWidth(ms.width);
+	DominoManager::getSingleton().setTileHeight(ms.height);
 	DominoManager::getSingleton().setCurEditorTileIndex(0);
+}
+void GameScene::updateDominoTilemap()
+{
+	TMXTiledMap* map = static_cast<TMXTiledMap*>(mLayerEditor->getChildByTag(kTagTileMap));
+	auto layer = map->getLayer("map");
+	int width = DominoManager::getSingleton().getTileWidth();
+	int height = DominoManager::getSingleton().getTileHeight();
+
+	TileMap& tilemap = DominoManager::getSingleton().getTileMap();
+	TileMap::iterator iter = tilemap.begin();
+	int index = 0;
+	int size = tilemap.size();
+	for (; iter != tilemap.end(); ++iter)
+	{
+		unsigned char tile = *iter;
+		if ((tile & 0x01) == 0)
+		{
+			tile = 1;
+		}
+		else
+		{
+			tile = (0x03 & (tile >> 1));
+			switch (tile)
+			{
+			case 0:
+				tile = 8;
+				break;
+			case 1:
+				tile = 5;
+				break;
+			case 2:
+				tile = 6;
+				break;
+			case 3:
+				tile = 7;
+				break;
+			default:
+				tile = 1;
+				break;
+			}
+		}
+		layer->setTileGID(tile, Vec2(index/width, index%width));
+		index++;
+	}
 }
 
 void GameScene::onEditorLayerTouchesMoved(const std::vector<Touch*>& touches, Event  *event)
@@ -612,6 +656,7 @@ void GameScene::touchEventBJ(Ref *pSender, ui::Widget::TouchEventType type)
 
 	case Widget::TouchEventType::ENDED:
 		mUILayerManager->switchTo(2);
+		NetManager::getSingleton().cs_DominoDownloadTilemap();
 		break;
 
 	case Widget::TouchEventType::CANCELED:
@@ -739,8 +784,41 @@ void GameScene::touchEventEditorUISave(Ref *pSender, ui::Widget::TouchEventType 
 		break;
 
 	case Widget::TouchEventType::ENDED:
-		mUILayerManager->switchTo(2);
-		mLayerManager->switchTo(1);
+	{
+		TMXTiledMap* map = static_cast<TMXTiledMap*>(mLayerEditor->getChildByTag(kTagTileMap));
+		auto ms = map->getMapSize();
+		auto layer = map->getLayer("map");
+		TileMap& tilemap = DominoManager::getSingleton().getTileMap();
+		tilemap.clear();
+		for (int i = 0; i < ms.height; i++)
+			for (int j = 0; j < ms.width; j++)
+			{
+				uint32_t gid = layer->getTileGIDAt(Vec2(i, j));
+				unsigned char tile = (0x01 << 7);
+				switch (gid)
+				{
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+					break;
+				case 5:
+					tile |= (0x01 << 1 | 0x01);
+					break;
+				case 6:
+					tile |= (0x02 << 1 | 0x01);
+					break;
+				case 7:
+					tile |= (0x03 << 1 | 0x01);
+					break;
+				case 8:
+					tile |= 0x01;
+					break;
+				}
+				tilemap.push_back(tile);
+			}
+		NetManager::getSingleton().cs_DominoUploadTilemap();
+	}
 		break;
 
 	case Widget::TouchEventType::CANCELED:

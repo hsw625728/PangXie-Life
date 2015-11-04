@@ -23,6 +23,10 @@ public:
 	void cs_GetSchedule();
 	void processGetScheduleRes(int tag, WorldPacket& packet);
 	void processPlayerUpdateState(int tag, WorldPacket& packet);
+	void cs_DominoUploadTilemap();
+	void processDominoUploadTilemapRes(int tag, WorldPacket& packet);
+	void cs_DominoDownloadTilemap();
+	void processDominoDownloadTilemapRes(int tag, WorldPacket& packet);
 };
 
 #endif

@@ -47,6 +47,10 @@ int DominoManager::getEditorTileType(int index) const
 	return mEditorTileType[index]; 
 }
 
+TileMap& DominoManager::getTileMap()
+{
+	return mTileMap;
+}
 void DominoManager::setTileWidth(unsigned int w)
 {
 	mTileWidth = w;

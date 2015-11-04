@@ -6,6 +6,7 @@
 #include "Singleton.h"
 
 #define EDITOR_UI_TILE_TYPE_MAX 8
+typedef std::vector<unsigned char> TileMap;
 
 class DominoManager: public Singleton<DominoManager>
 {
@@ -18,6 +19,7 @@ public:
 	unsigned int getCurEditorTileIndex() const;
 	int getCurEditorTileType() const;
 	int getEditorTileType(int index) const;
+	TileMap& getTileMap();
 
 	void setTileWidth(unsigned int w);
 	void setTileHeight(unsigned int h);
@@ -27,7 +29,7 @@ public:
 	cocos2d::CCPoint calculateCoordinate(float x, float y, float mapWidth, float mapHeight);
 
 private:
-	std::vector<char> mTileMap;
+	TileMap mTileMap;
 	unsigned int mTileWidth;
 	unsigned int mTileHeight;
 	unsigned int mCurEditorTileIndex;

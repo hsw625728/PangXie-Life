@@ -2,6 +2,7 @@
 #include "Protocol.h"
 #include "GameScene.h"
 #include "Player.h"
+#include "DominoManager.h"
 
 #define LIFE_SOCKET_ID 1
 
@@ -118,6 +119,56 @@ void NetManager::processPlayerUpdateState(int tag, WorldPacket& packet)
 	packet.GetPacketString<uint8_t>(msg);
 	GameScene::getSingleton().updatePlayerState(msg);
 }
+void NetManager::cs_DominoUploadTilemap()
+{
+	TileMap& tilemap = DominoManager::getSingleton().getTileMap();
+	WorldPacket packet;
+	packet.clear();
+	packet.SetOpcode(MSG_CS_DOMINO_UPLOAD_TILEMAP);
+	packet.AppendPacketString<uint8>(Player::getSingleton().getID());
+	packet << (int)1;
+	packet << (int)tilemap.size();
+	packet.writeVector(tilemap);
+	packet.SetLength(packet.size());
+	sSocketMgr.SendPacket(LIFE_SOCKET_ID, &packet);
+}
+void NetManager::processDominoUploadTilemapRes(int tag, WorldPacket& packet)
+{
+	short ret = 0;
+	packet >> ret;
+	if (ret == 0)
+	{
+		//±£´æ³É¹¦×´Ì¬
+	}
+	else
+	{
+		//±£´æÊ§°Ü×´Ì¬
+	}
+}
+void NetManager::cs_DominoDownloadTilemap()
+{
+	WorldPacket packet;
+	packet.clear();
+	packet.SetOpcode(MSG_CS_DOMINO_DOWNLOAD_TILEMAP);
+	packet.AppendPacketString<uint8>(Player::getSingleton().getID());
+	packet << (int)1;
+	packet.SetLength(packet.size());
+	sSocketMgr.SendPacket(LIFE_SOCKET_ID, &packet);
+}
+void NetManager::processDominoDownloadTilemapRes(int tag, WorldPacket& packet)
+{
+	short ret = 0;
+	packet >> ret;
+	if (ret == 0)
+	{
+		std::string tilemapstr;
+		packet.GetPacketString<uint8>(tilemapstr);
+		TileMap& tilemap = DominoManager::getSingleton().getTileMap();
+		tilemap.clear();
+		tilemap.assign(tilemapstr.begin(), tilemapstr.end());
+		GameScene::getSingleton().updateDominoTilemap();
+	}
+}
 bool NetManager::processAll(int tag, int cmd, WorldPacket& packet)
 {
 	switch (cmd)
@@ -136,6 +187,12 @@ bool NetManager::processAll(int tag, int cmd, WorldPacket& packet)
 		break;
 	case MSG_SC_UPDATE_PLAYER_STATE:
 		processPlayerUpdateState(tag, packet);
+		break;
+	case MSG_SC_DOMINO_UPLOAD_RES:
+		processDominoUploadTilemapRes(tag, packet);
+		break;
+	case MSG_SC_DOMINO_DOWNLOAD_TILEMAP_RES:
+		processDominoDownloadTilemapRes(tag, packet);
 		break;
 	default:
 		break;

@@ -24,6 +24,7 @@ public:
 	void updateEditorUIMenuLayer();
 	void updateEditorUILayer();
 	void updateEditorLayer();
+	void updateDominoTilemap();
 	void onEditorLayerTouchesMoved(const std::vector<Touch*>& touches, Event  *event);
 	void onEditorLayerTouchesBegan(const std::vector<Touch*>& touches, Event  *event);
 	void onChangedEditorUIRadioButtonGroup(ui::RadioButton* radioButton, int index, ui::RadioButtonGroup::EventType type);
