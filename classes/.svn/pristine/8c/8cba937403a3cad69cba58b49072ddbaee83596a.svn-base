@@ -11,7 +11,7 @@
 using namespace cocos2d;
 using namespace ui;
 
-class GameScene : public Scene, public Singleton<GameScene>
+class GameScene : public cocos2d::Scene, public Singleton<GameScene>
 {
 public:
 	GameScene();
@@ -37,8 +37,6 @@ public:
 	void touchEventEditorUIMenuClone(Ref *pSender, ui::Widget::TouchEventType type);
 	void touchEventEditorUIMenuTest(Ref *pSender, ui::Widget::TouchEventType type);
 	void touchEventEditorUISave(Ref *pSender, ui::Widget::TouchEventType type);
-	void touchEventEditorUISaveRes(int state);
-	void touchEventEditorUISaveResButtonCallback(Node *pNode);
 	void touchEventEditorUICancel(Ref *pSender, ui::Widget::TouchEventType type);
 	void touchEventEditorUIRemove(Ref *pSender, ui::Widget::TouchEventType type);
 	void touchEventEditorUIDelete(Ref *pSender, ui::Widget::TouchEventType type);

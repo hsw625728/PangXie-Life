@@ -136,9 +136,14 @@ void NetManager::processDominoUploadTilemapRes(int tag, WorldPacket& packet)
 {
 	short ret = 0;
 	packet >> ret;
-	//ret == 0 表示保存成功
-	//保存成功状态
-	GameScene::getSingleton().touchEventEditorUISaveRes(ret);
+	if (ret == 0)
+	{
+		//保存成功状态
+	}
+	else
+	{
+		//保存失败状态
+	}
 }
 void NetManager::cs_DominoDownloadTilemap()
 {

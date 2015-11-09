@@ -2,7 +2,6 @@
 #include "Player.h"
 #include "DominoManager.h"
 #include "NetWork.h"
-#include "MessageBoxLayer.h"
 #include "ui/UIButton.h"
 #include "ui/UIRadioButton.h"
 
@@ -95,7 +94,7 @@ void GameScene::onEnter()
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	//排行榜
-	Button* button_ph = Button::create("button_ranklist.png", "button_ranklist.png");
+	Button* button_ph = Button::create("button_schedule.png", "button_schedule.png");
 	//button->setContentSize(Size(400, 100));
 	button_ph->setPosition(origin + Vec2(visibleSize.width/2, visibleSize.height/2 - 260));
 	button_ph->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventPH, this));
@@ -104,7 +103,7 @@ void GameScene::onEnter()
 	mLayerUI->addChild(button_ph);
 
 	//编辑器
-	Button* button_bj = Button::create("button_editor.png", "button_editor.png");
+	Button* button_bj = Button::create("button_schedule.png", "button_schedule.png");
 	//button->setContentSize(Size(400, 100));
 	button_bj->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2));
 	button_bj->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventBJ, this));
@@ -115,7 +114,7 @@ void GameScene::onEnter()
 	updateEditorUILayer();
 	updateEditorLayer();
 	//我的骨牌
-	Button* button_my = Button::create("button_play_domino.png", "button_play_domino.png");
+	Button* button_my = Button::create("button_schedule.png", "button_schedule.png");
 	//button->setContentSize(Size(400, 100));
 	button_my->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height / 2 + 260));
 	button_my->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventMY, this));
@@ -216,24 +215,23 @@ void GameScene::updateEditorUIMenuLayer()
 
 	//关闭按钮
 	Button* button_close = Button::create("CloseNormal.png", "CloseSelected.png");
-	button_close->setPosition(Vec2(layout_title->getSize().width * 0.9f , layout_title->getSize().height*0.1f));
+	button_close->setPosition(Vec2(layout_title->getSize().width * 0.9f , 1));
 	button_close->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIMenuClose, this));
-	button_close->setScale(2.0f);
 	layout_title->addChild(button_close);
 
 	//编辑按钮
-	Button* button_editor = Button::create("button_editor.png", "button_editor.png");
-	button_editor->setPosition(Vec2(visibleSize.width * 0.25f, visibleSize.height * 0.1f));
+	Button* button_editor = Button::create("button_schedule.png", "button_schedule.png");
+	button_editor->setPosition(Vec2(visibleSize.width / 2 - 150, 10));
 	button_editor->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIMenuEditor, this));
 	layoutBG->addChild(button_editor);
 	//复制按钮
-	Button* button_clone = Button::create("button_copy.png", "button_copy.png");
-	button_clone->setPosition(Vec2(visibleSize.width / 2, visibleSize.height * 0.1f));
+	Button* button_clone = Button::create("button_schedule.png", "button_schedule.png");
+	button_clone->setPosition(Vec2(visibleSize.width / 2, 10));
 	button_clone->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIMenuClone, this));
 	layoutBG->addChild(button_clone);
 	//测试按钮
-	Button* button_test = Button::create("button_test.png", "button_test.png");
-	button_test->setPosition(Vec2(visibleSize.width * 0.75f, visibleSize.height * 0.1f));
+	Button* button_test = Button::create("button_schedule.png", "button_schedule.png");
+	button_test->setPosition(Vec2(visibleSize.width / 2 + 150, 10));
 	button_test->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIMenuTest, this));
 	layoutBG->addChild(button_test);
 
@@ -405,26 +403,26 @@ void GameScene::updateEditorUILayer()
 	radioButtonGroup->setSelectedButton(0);
 
 	//保存按钮
-	Button* button_save = Button::create("button_save.png", "button_save.png");
-	button_save->setPosition(Vec2(visibleSize.width*0.05f, visibleSize.height*0.26f));
+	Button* button_save = Button::create("button_schedule.png", "button_schedule.png");
+	button_save->setPosition(Vec2(visibleSize.width*0.1f, visibleSize.height*0.4f));
 	button_save->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUISave, this));
 	mLayerUIEditor->addChild(button_save);
 
 	//取消按钮
-	Button* button_cancel = Button::create("button_cancel.png", "button_cancel.png");
-	button_cancel->setPosition(Vec2(visibleSize.width*0.05f, visibleSize.height*0.22f));
+	Button* button_cancel = Button::create("button_schedule.png", "button_schedule.png");
+	button_cancel->setPosition(Vec2(visibleSize.width*0.1f, visibleSize.height*0.25f));
 	button_cancel->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUICancel, this));
 	mLayerUIEditor->addChild(button_cancel);
 
 	//移除按钮
-	Button* button_remove = Button::create("button_remove.png", "button_remove.png");
-	button_remove->setPosition(Vec2(visibleSize.width*0.95f, visibleSize.height*0.26f));
+	Button* button_remove = Button::create("button_schedule.png", "button_schedule.png");
+	button_remove->setPosition(Vec2(visibleSize.width*0.8f, visibleSize.height*0.4f));
 	button_remove->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIRemove, this));
 	mLayerUIEditor->addChild(button_remove);
 
 	//删除模式按钮
-	Button* button_delete = Button::create("button_delete.png", "button_delete.png");
-	button_delete->setPosition(Vec2(visibleSize.width*0.95f, visibleSize.height*0.22f));
+	Button* button_delete = Button::create("button_schedule.png", "button_schedule.png");
+	button_delete->setPosition(Vec2(visibleSize.width*0.8f, visibleSize.height*0.25));
 	button_delete->addTouchEventListener(CC_CALLBACK_2(GameScene::touchEventEditorUIDelete, this));
 	mLayerUIEditor->addChild(button_delete);
 }
@@ -829,27 +827,6 @@ void GameScene::touchEventEditorUISave(Ref *pSender, ui::Widget::TouchEventType 
 	default:
 		break;
 	}
-}
-void GameScene::touchEventEditorUISaveRes(int state)
-{
-	// 定义一个弹出层，传入一张背景图
-	PopupLayer* pl = PopupLayer::create("gray.png");
-	// ContentSize 是可选的设置，可以不设置，如果设置把它当作 9 图缩放
-	pl->setContentSize(CCSizeMake(400, 350));
-	pl->setTitle("Title");
-	pl->setContentText("Message!", 20, 60, 250);
-	// 设置回调函数，回调传回一个 CCNode 以获取 tag 判断点击的按钮
-	// 这只是作为一种封装实现，如果使用 delegate 那就能够更灵活的控制参数了
-	pl->setCallbackFunc(this, callfuncN_selector(GameScene::touchEventEditorUISaveResButtonCallback));
-	// 添加按钮，设置图片，文字，tag 信息
-	pl->addButton("gray.png", "gray.png", "OK", 0);
-	pl->addButton("gray.png", "gray.png", "Cancel", 1);
-	// 添加到当前层
-	mLayerEditor->addChild(pl);
-
-}
-void GameScene::touchEventEditorUISaveResButtonCallback(Node *pNode)
-{
 }
 void GameScene::touchEventEditorUICancel(Ref *pSender, ui::Widget::TouchEventType type)
 {
